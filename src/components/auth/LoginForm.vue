@@ -2,47 +2,44 @@
 import { ref, reactive } from 'vue';
 import InputField from '../ui/InputField.vue';
 import Button from '../ui/Button.vue';
+import { useAuth } from '../../composables/auth/useAuth';
 
 // Props and Emits
 const emit = defineEmits<{
     loginSuccess: [];
 }>()
 
+// Composables
+const { login, loading, isSubmitting } = useAuth();
+
 // reactive data
-const isLoading = ref(false);
 const showPassword = ref(false);
 const rememberMe = ref(false);
 
 const formData = reactive({
-    email: '',
+    username: '', 
     password: ''
 })
 
-
 const errors = reactive({
-    email: '',
+    username: '', 
     password: '',
     general: ''
 })
 
 // Methods
 const validateForm = (): boolean => {
-    errors.email = '';
+    errors.username = '';
     errors.password = '';
     errors.general = '';
 
     let isValid = true;
 
-    // email validation
-    if (!formData.email) {
-        errors.email = 'Email is required';
-        isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        errors.email = 'Invalid email format';
+    if (!formData.username) {
+        errors.username = 'Username or email is required';
         isValid = false;
     }
 
-    // password validation
     if (!formData.password) {
         errors.password = 'Password is required';
         isValid = false;
@@ -54,27 +51,22 @@ const validateForm = (): boolean => {
     return isValid;
 }
 
-const handleSubmit = async () => {
-    if (!validateForm()) return
-
-    isLoading.value = true;
-    errors.general = '';
+const handleSubmit = async (event: Event) => {
+    event.preventDefault();
+    
+    if (!validateForm()) return;
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1500))
-
-    } catch (error) {
-        console.error('Login failed:', error);
-        errors.general = 'Login failed. Please try again.';
-    } finally {
-        isLoading.value = false;
+        await login(formData);
+        emit('loginSuccess');
+    } catch (error: any) {
+        errors.general = error.message || 'Login failed. Please try again.';
     }
 }
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
 }
-
 </script>
 
 <template>
@@ -83,18 +75,30 @@ const togglePasswordVisibility = () => {
             {{ errors.general }}
         </div>
 
-        <InputField v-model="formData.email" type="email" label="Email" placeholder="Enter your email"
-            :error="errors.email" required>
+        <InputField 
+            v-model="formData.username" 
+            type="text" 
+            label="Username or Email" 
+            placeholder="Enter your username or email"
+            :error="errors.username" 
+            required
+        >
             <template #icon>
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
             </template>
         </InputField>
 
-        <InputField label="Password" :type="showPassword ? 'text' : 'password'" placeholder="Enter yout password"
-            v-model="formData.password" :error="errors.password" required>
+        <InputField 
+            label="Password" 
+            :type="showPassword ? 'text' : 'password'" 
+            placeholder="Enter your password"
+            v-model="formData.password" 
+            :error="errors.password" 
+            required
+        >
             <template #icon>
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -129,8 +133,15 @@ const togglePasswordVisibility = () => {
             </button>
         </div>
 
-        <Button type="submit" variant="primary" size="lg" :loading="isLoading" :disabled="isLoading" class="w-full">
-            {{ isLoading ? 'Signing in...' : 'Sign In' }}
+        <Button 
+            type="submit" 
+            variant="primary" 
+            size="lg" 
+            :loading="loading || isSubmitting" 
+            :disabled="loading || isSubmitting" 
+            class="w-full"
+        >
+            {{ (loading || isSubmitting) ? 'Signing in...' : 'Sign In' }}
         </Button>
     </form>
 </template>

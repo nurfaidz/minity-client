@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import LoginForm from '../../components/auth/LoginForm.vue';
 import AuthLayout from '../../components/auth/AuthLayout.vue';
@@ -7,12 +6,15 @@ import AuthLayout from '../../components/auth/AuthLayout.vue';
 const router = useRouter();
 
 const handleLoginSuccess = () => {
-    // Redirect to home page after successful login
-    alert('Login successful!');
+    //
 };
 
 const goToHome = () => {
     router.push({ name: 'home' });
+};
+
+const goToSignup = () => {
+    router.push({ name: 'signup' });
 };
 </script>
 
@@ -33,12 +35,17 @@ const goToHome = () => {
                 </p>
             </div>
         </template>
+       
         <LoginForm @login-success="handleLoginSuccess" />
+       
         <template #footer>
             <div class="text-center mt-6">
                 <p class="text-gray-600">
                     Don't have an account?
-                    <button class="text-blue-600 hover:text-blue-700 font-medium ml-1 transition-colors">
+                    <button
+                        @click="goToSignup"
+                        class="text-blue-600 hover:text-blue-700 font-medium ml-1 transition-colors"
+                    >
                         Sign up here
                     </button>
                 </p>
