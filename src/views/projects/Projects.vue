@@ -5,20 +5,6 @@ import ProjectCard from '../../components/ui/ProjectCard.vue'
 
 const router = useRouter()
 
-interface Project {
-    id: number
-    name: string
-    type: 'development' | 'maintenance'
-    status: 'active' | 'completed' | 'on-hold'
-    progress: number
-    dueDate: string
-    tasksCount: {
-        todo: number
-        inProgress: number
-        review: number
-        done: number
-    }
-}
 // Mock data
 const projects = ref<Project[]>([
     {
