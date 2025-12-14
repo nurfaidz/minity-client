@@ -16,6 +16,9 @@ export interface Project {
     status: 'active' | 'completed' | 'on-hold'
     progress: number
     dueDate: string
+    description?: string 
+    client?: string      
+    team?: any[]         
     tasksCount: {
         todo: number
         inProgress: number
