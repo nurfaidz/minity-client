@@ -50,7 +50,7 @@ const formatDate = (dateString: string) => {
     const today = new Date()
     const diffTime = date.getTime() - today.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
+   
     if (diffDays < 0) return `${Math.abs(diffDays)} days overdue`
     if (diffDays === 0) return 'Due today'
     if (diffDays === 1) return 'Due tomorrow'
@@ -79,7 +79,7 @@ const isDueToday = (dateString: string) => {
                 </div>
                 <div class="text-sm text-gray-500">{{ task.projectName }}</div>
             </div>
-            
+           
             <!-- Priority Indicator -->
             <div class="flex items-center space-x-2">
                 <div :class="['px-2 py-1 rounded-lg text-xs font-medium border flex items-center', getPriorityColor(task.priority)]">
@@ -88,27 +88,38 @@ const isDueToday = (dateString: string) => {
                 </div>
             </div>
         </div>
-
+        
         <div class="flex items-center justify-between">
             <!-- Status Badge -->
             <div :class="['px-3 py-1 rounded-full text-xs font-medium border', getStatusColor(task.status)]">
                 {{ task.status.replace('-', ' ') }}
             </div>
-            
+           
             <!-- Due Date -->
             <div :class="[
                 'text-xs font-medium',
-                isOverdue(task.dueDate) ? 'text-red-600' : 
+                isOverdue(task.dueDate) ? 'text-red-600' :
                 isDueToday(task.dueDate) ? 'text-amber-600' : 'text-gray-500'
             ]">
                 {{ formatDate(task.dueDate) }}
             </div>
         </div>
-
+        
         <!-- Progress indicator for in-progress tasks -->
         <div v-if="task.status === 'in-progress'" class="mt-3">
             <div class="w-full bg-gray-200 rounded-full h-1">
                 <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-1 rounded-full animate-pulse" style="width: 60%"></div>
+            </div>
+        </div>
+
+        <!-- Assignee -->
+        <div v-if="task.assignee" class="mt-3 pt-3 border-t border-gray-100">
+            <div class="flex items-center text-xs text-gray-600">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                {{ task.assignee }}
             </div>
         </div>
     </div>

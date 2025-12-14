@@ -78,8 +78,8 @@ const togglePasswordVisibility = () => {
         <InputField 
             v-model="formData.username" 
             type="text" 
-            label="Username or Email" 
-            placeholder="Enter your username or email"
+            label="Username" 
+            placeholder="Enter your username"
             :error="errors.username" 
             required
         >

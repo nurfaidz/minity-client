@@ -35,8 +35,8 @@ const getTypeIcon = (type: string) => {
 }
 
 const getTypeGradient = (type: string) => {
-    return type === 'development' 
-        ? 'from-blue-500 to-indigo-500' 
+    return type === 'development'
+        ? 'from-blue-500 to-indigo-500'
         : 'from-emerald-500 to-green-500'
 }
 
@@ -67,7 +67,7 @@ const formatDate = (dateString: string) => {
                 {{ project.status.replace('-', ' ') }}
             </div>
         </div>
-
+        
         <!-- Progress Section -->
         <div class="mb-4">
             <div class="flex items-center justify-between mb-2">
@@ -75,11 +75,11 @@ const formatDate = (dateString: string) => {
                 <span class="text-sm font-bold text-gray-900">{{ project.progress }}%</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div :class="['h-full bg-gradient-to-r', getTypeGradient(project.type), 'rounded-full transition-all duration-500 ease-out']" 
+                <div :class="['h-full bg-gradient-to-r', getTypeGradient(project.type), 'rounded-full transition-all duration-500 ease-out']"
                      :style="`width: ${project.progress}%`"></div>
             </div>
         </div>
-
+        
         <!-- Task Summary -->
         <div class="flex items-center justify-between text-xs">
             <div class="flex items-center space-x-4">
