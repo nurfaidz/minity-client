@@ -1,78 +1,48 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
+import { useAuth } from '../../composables/auth/useAuth';
 import InputField from '../ui/InputField.vue';
 import Button from '../ui/Button.vue';
-import { useAuth } from '../../composables/auth/useAuth';
 
-// Props and Emits
-const emit = defineEmits<{
-    loginSuccess: [];
-}>()
+const { login, loading, error } = useAuth();
 
-// Composables
-const { login, loading, isSubmitting } = useAuth();
-
-// reactive data
 const showPassword = ref(false);
 const rememberMe = ref(false);
 
 const formData = reactive({
     username: '', 
     password: ''
-})
+});
 
-const errors = reactive({
-    username: '', 
-    password: '',
-    general: ''
-})
-
-// Methods
-const validateForm = (): boolean => {
-    errors.username = '';
-    errors.password = '';
-    errors.general = '';
-
-    let isValid = true;
-
-    if (!formData.username) {
-        errors.username = 'Username or email is required';
-        isValid = false;
-    }
-
-    if (!formData.password) {
-        errors.password = 'Password is required';
-        isValid = false;
-    } else if (formData.password.length < 6) {
-        errors.password = 'Password must be at least 6 characters';
-        isValid = false;
-    }
-
-    return isValid;
-}
-
-const handleSubmit = async (event: Event) => {
-    event.preventDefault();
-    
-    if (!validateForm()) return;
-
-    try {
-        await login(formData);
-        emit('loginSuccess');
-    } catch (error: any) {
-        errors.general = error.message || 'Login failed. Please try again.';
-    }
-}
+const validationError = ref('');
 
 const togglePasswordVisibility = () => {
     showPassword.value = !showPassword.value;
 }
+
+const handleSubmit = async () => {
+    validationError.value = '';
+    
+    if (!formData.username || !formData.password) {
+        validationError.value = 'Username and Password are required.';
+        return;
+    }
+    
+    if (formData.password.length < 6) {
+        validationError.value = 'Password must be at least 6 characters.';
+        return;
+    }
+
+    await login(formData); 
+}
 </script>
 
 <template>
-    <form @submit="handleSubmit" class="space-y-6">
-        <div v-if="errors.general" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg text-sm">
-            {{ errors.general }}
+    <form @submit.prevent="handleSubmit" class="space-y-6">
+        
+        <div v-if="error || validationError" class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg text-sm flex items-start">
+            <svg class="w-5 h-5 mr-2 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <span>{{ error || validationError }}</span>
         </div>
 
         <InputField 
@@ -80,7 +50,6 @@ const togglePasswordVisibility = () => {
             type="text" 
             label="Username" 
             placeholder="Enter your username"
-            :error="errors.username" 
             required
         >
             <template #icon>
@@ -96,7 +65,6 @@ const togglePasswordVisibility = () => {
             :type="showPassword ? 'text' : 'password'" 
             placeholder="Enter your password"
             v-model="formData.password" 
-            :error="errors.password" 
             required
         >
             <template #icon>
@@ -123,7 +91,7 @@ const togglePasswordVisibility = () => {
         </InputField>
 
         <div class="flex items-center justify-between">
-            <label class="flex items-center">
+            <label class="flex items-center cursor-pointer">
                 <input type="checkbox" v-model="rememberMe"
                     class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
                 <span class="ml-2 text-sm text-gray-600">Remember me</span>
@@ -137,11 +105,11 @@ const togglePasswordVisibility = () => {
             type="submit" 
             variant="primary" 
             size="lg" 
-            :loading="loading || isSubmitting" 
-            :disabled="loading || isSubmitting" 
+            :loading="loading" 
+            :disabled="loading" 
             class="w-full"
         >
-            {{ (loading || isSubmitting) ? 'Signing in...' : 'Sign In' }}
+            {{ loading ? 'Signing in...' : 'Sign In' }}
         </Button>
     </form>
 </template>

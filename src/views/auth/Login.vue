@@ -5,10 +5,6 @@ import AuthLayout from '../../components/auth/AuthLayout.vue';
 
 const router = useRouter();
 
-const handleLoginSuccess = () => {
-    //
-};
-
 const goToHome = () => {
     router.push({ name: 'home' });
 };
@@ -23,7 +19,7 @@ const goToSignup = () => {
         <template #header>
             <div class="text-center mb-8">
                 <div class="flex justify-center items-center mb-6">
-                    <div class="text-3xl font-bold text-blue-600 cursor-pointer" @click="goToHome">
+                    <div class="text-3xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition-colors" @click="goToHome">
                         Minity
                     </div>
                 </div>
@@ -35,16 +31,16 @@ const goToSignup = () => {
                 </p>
             </div>
         </template>
-       
-        <LoginForm @login-success="handleLoginSuccess" />
-       
+        
+        <LoginForm />
+        
         <template #footer>
             <div class="text-center mt-6">
                 <p class="text-gray-600">
                     Don't have an account?
                     <button
                         @click="goToSignup"
-                        class="text-blue-600 hover:text-blue-700 font-medium ml-1 transition-colors"
+                        class="text-blue-600 hover:text-blue-700 font-medium ml-1 transition-colors focus:outline-none focus:underline"
                     >
                         Sign up here
                     </button>
