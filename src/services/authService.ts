@@ -11,7 +11,7 @@ export const authService = {
     },
     
     async getUser() {
-        const response = await apiClient.get('/me') 
-        return response.data
+        const response = await apiClient.get('/me')
+        return response.data.data || response.data
     }
 }

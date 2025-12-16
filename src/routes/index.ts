@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { authRoutes } from './auth';
 import { useAuth } from '../composables/auth/useAuth'; 
-import { authService } from '../services/authService'; 
 
 import AppLayout from '../components/layout/AppLayout.vue';
 import Index from '../views/home/Index.vue';
@@ -48,31 +47,29 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach(async (to, from, next) => {
-    const { user } = useAuth(); 
+router.beforeEach(async (to, _from, next) => {
+    const { checkAuth } = useAuth(); 
     
-    const checkUserSession = async () => {
-        if (user.value) return true;
-        try {
-            const userData = await authService.getUser(); 
-            user.value = userData; 
-            return true;
-        } catch (error) {
-            return false; 
-        }
-    };
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const isGuestRoute = to.matched.some(record => record.meta.guest);
 
-    if (to.meta.requiresAuth) {
-        const isValid = await checkUserSession();
-        if (!isValid) {
-            return next({ name: 'login' });
+    if (requiresAuth) {
+        const isAuthenticated = await checkAuth();
+        
+        if (!isAuthenticated) {
+            return next({ 
+                name: 'login', 
+                query: { redirect: to.fullPath } 
+            });
         }
     }
 
-    if (to.meta.guest) {
-        const isValid = await checkUserSession();
-        if (isValid) {
-            return next({ name: 'dashboard' });
+    if (isGuestRoute) {
+        const isAuthenticated = await checkAuth();
+        
+        if (isAuthenticated) {
+            const redirectPath = to.query.redirect as string || '/dashboard';
+            return next(redirectPath);
         }
     }
 
